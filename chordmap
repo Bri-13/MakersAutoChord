@@ -20,15 +20,16 @@
 #define M6_DIR  13
 // CHORD DEFINITIONS
 // Order ALWAYS:  {E , A , D , G , B , e }
-int CHORD_C[6]  = {-1, 3, 2, 0, 1, 0};
-int CHORD_A[6]  = {-1, 0, 2, 2, 2, 0};
+int CHORD_C[6]  = {0, 3, 2, 0, 1, 0};
+int CHORD_A[6]  = {0, 0, 2, 2, 2, 0};
 int CHORD_G[6]  = {3, 2, 0, 0, 0, 3};
 int CHORD_E[6]  = {0, 2, 2, 1, 0, 0};
-int CHORD_D[6]  = {-1, -1, 0, 2, 3, 2};
+int CHORD_D[6]  = {0, 0, 0, 2, 3, 2};
 int CHORD_F[6]  = {1, 3, 3, 2, 1, 1};
-int CHORD_Am[6] = {-1, 0, 2, 2, 1, 0};
-int CHORD_Dm[6] = {-1, -1, 0, 2, 3, 1};
+int CHORD_Am[6] = {0, 0, 2, 2, 1, 0};
+int CHORD_Dm[6] = {0, 0, 0, 2, 3, 1};
 int CHORD_Em[6] = {0, 2, 2, 0, 0, 0};
+int CHORD_Fmaj7[6] = {0, 0, 3, 2, 1, 0};
 //MOTOR + LEADSCREW CONSTANTS 
 const float STEPS_PER_REV = 200.0;        // typical MERCURY MOTOR SM-42BYG011-25 = 200 steps
 const float MICROSTEPPING = 16.0;         // each step broken into 16 microsteps
@@ -38,15 +39,16 @@ float STEPS_PER_MM = (STEPS_PER_REV * MICROSTEPPING) / LEAD_MM;
 // FRET POSITIONS IN MILLIMETERS
 // fret positions in mm(add cumulative distances+calculate midpoint of target fret)
 // how far up/down the actuator must move.
+// on edge w enough room for piston, in cm
 float fret_mm_pos[8] = {
   0,        // open string no press
-  18.6,     // fret 1
-  53.07,    // fret 2
-  86.87,    // fret 3
-  118.0,    // fret 4
-  148.34,   // fret 5
-  176.4,    // fret 6
-  202.92    // fret 7
+  17,     // fret 1
+  52,    // fret 2
+  85,    // fret 3
+  118,    // fret 4
+  146,   // fret 5
+  175,    // fret 6
+  200    // fret 7
 };
 // MOTOR MOVE FUNCTION
 // motor function to move stepper
