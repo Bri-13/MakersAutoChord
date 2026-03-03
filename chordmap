@@ -1,0 +1,140 @@
+// 6 MOTOR MECHANISM, ASSUMING START IS AT TOP ALWAYS(OTHERWISE NEED HOMING SWITCH)
+// MERCURY MOTOR SM-42BYG011-25 2-PHASE
+
+//1.8° per step
+
+//200 steps per revolution
+// motor + leadscrew parameters
+// MOTOR PIN DEFINITIONS
+#define M1_STEP 2
+#define M1_DIR  3
+#define M2_STEP 4
+#define M2_DIR  5
+#define M3_STEP 6
+#define M3_DIR  7
+#define M4_STEP 8
+#define M4_DIR  9
+#define M5_STEP 10
+#define M5_DIR  11
+#define M6_STEP 12
+#define M6_DIR  13
+// CHORD DEFINITIONS
+// Order ALWAYS:  {E , A , D , G , B , e }
+int CHORD_C[6]  = {-1, 3, 2, 0, 1, 0};
+int CHORD_A[6]  = {-1, 0, 2, 2, 2, 0};
+int CHORD_G[6]  = {3, 2, 0, 0, 0, 3};
+int CHORD_E[6]  = {0, 2, 2, 1, 0, 0};
+int CHORD_D[6]  = {-1, -1, 0, 2, 3, 2};
+int CHORD_F[6]  = {1, 3, 3, 2, 1, 1};
+int CHORD_Am[6] = {-1, 0, 2, 2, 1, 0};
+int CHORD_Dm[6] = {-1, -1, 0, 2, 3, 1};
+int CHORD_Em[6] = {0, 2, 2, 0, 0, 0};
+//MOTOR + LEADSCREW CONSTANTS 
+const float STEPS_PER_REV = 200.0;        // typical MERCURY MOTOR SM-42BYG011-25 = 200 steps
+const float MICROSTEPPING = 16.0;         // each step broken into 16 microsteps
+const float LEAD_MM = 8.0;                // 8mm per full revolution
+// convert to steps per mm
+float STEPS_PER_MM = (STEPS_PER_REV * MICROSTEPPING) / LEAD_MM;
+// FRET POSITIONS IN MILLIMETERS
+// fret positions in mm(add cumulative distances+calculate midpoint of target fret)
+// how far up/down the actuator must move.
+float fret_mm_pos[8] = {
+  0,        // open string no press
+  18.6,     // fret 1
+  53.07,    // fret 2
+  86.87,    // fret 3
+  118.0,    // fret 4
+  148.34,   // fret 5
+  176.4,    // fret 6
+  202.92    // fret 7
+};
+// MOTOR MOVE FUNCTION
+// motor function to move stepper
+void moveMotorMM(int stepPin, int dirPin, float mm) {
+  // convert millimeters to number of motor steps
+  long steps = mm * STEPS_PER_MM;
+  // determine direction: true if mm >= 0 (downwards), false if mm < 0 (upwards)
+  bool direction = mm >= 0;
+  // Set the direction pin HIGH or LOW depending on movement direction
+  digitalWrite(dirPin, direction ? HIGH : LOW);
+  steps = abs(steps);
+  for (long i = 0; i < steps; i++) {
+    // Send a HIGH signal to STEP pin to advance one microstep 
+    digitalWrite(stepPin, HIGH);
+    delayMicroseconds(700);
+    // Bring the STEP pin LOW to complete the step pulse 
+    digitalWrite(stepPin, LOW);
+    delayMicroseconds(700);
+  }
+}
+//GO TO SPECIFIC FRET
+void goToFret(int stringNum, int fretNum) {
+  // Prevent invalid fret numbers
+  if (fretNum < 0 || fretNum > 7) return;
+  // Look up the distance (mm) for that fret
+  float mm = fret_mm_pos[fretNum];
+  // Decide which lift kit (motor) to move:
+  switch (stringNum) {
+    case 1: moveMotorMM(M1_STEP, M1_DIR, mm); break;
+    case 2: moveMotorMM(M2_STEP, M2_DIR, mm); break;
+    case 3: moveMotorMM(M3_STEP, M3_DIR, mm); break;
+    case 4: moveMotorMM(M4_STEP, M4_DIR, mm); break;
+    case 5: moveMotorMM(M5_STEP, M5_DIR, mm); break;
+    case 6: moveMotorMM(M6_STEP, M6_DIR, mm); break;
+  }
+}
+// RELEASE STRING (GO TOP HARD STOP)
+void releaseString(int stringNum) {
+  // Goes up past 0 to ensure it touches top hard stop.
+  // Negative direction = up.
+  switch (stringNum) {
+    case 1: moveMotorMM(M1_STEP, M1_DIR, -250); break;
+    case 2: moveMotorMM(M2_STEP, M2_DIR, -250); break;
+    case 3: moveMotorMM(M3_STEP, M3_DIR, -250); break;
+    case 4: moveMotorMM(M4_STEP, M4_DIR, -250); break;
+    case 5: moveMotorMM(M5_STEP, M5_DIR, -250); break;
+    case 6: moveMotorMM(M6_STEP, M6_DIR, -250); break;
+  }
+}
+// PLAY A WHOLE CHORD 
+void playChord(int chord[6]) {
+  for (int i = 0; i < 6; i++) {
+    int fret = chord[i];
+    if (fret < 0) {
+      // muted
+      releaseString(i + 1);
+    }
+    else if (fret == 0) {
+      // open string
+      releaseString(i + 1);
+    }
+    else {
+      // fret 1–7
+      goToFret(i + 1, fret);
+    }
+  }
+}
+// ARDUINO SETUP 
+void setup() {
+  Serial.begin(115200);
+  // set all pins
+  pinMode(M1_STEP, OUTPUT); pinMode(M1_DIR, OUTPUT);
+  pinMode(M2_STEP, OUTPUT); pinMode(M2_DIR, OUTPUT);
+  pinMode(M3_STEP, OUTPUT); pinMode(M3_DIR, OUTPUT);
+  pinMode(M4_STEP, OUTPUT); pinMode(M4_DIR, OUTPUT);
+  pinMode(M5_STEP, OUTPUT); pinMode(M5_DIR, OUTPUT);
+  pinMode(M6_STEP, OUTPUT); pinMode(M6_DIR, OUTPUT);
+  // STARTUP RESET: move all motors up to the top hard stop
+  for (int s = 1; s <= 6; s++) {
+    releaseString(s);
+  }
+  Serial.println("Guitar Fret System Ready.");
+}
+// MAIN LOOP (TEST)
+void loop() {
+  Serial.println("Playing C");
+  playChord(CHORD_C);
+  delay(2000);
+  Serial.println("Releasing all...");
+  for (int s = 1; s <= 6; s++) releaseString(s);
+  delay(2000);
