@@ -130,9 +130,10 @@ void setup() {
 }
 // MAIN LOOP (TEST)
 void loop() {
-  Serial.println("Playing C");
-  playChord(CHORD_C);
-  delay(2000);
+  # Beginning of Riptide
+  Serial.println("Playing Am");
+  playChord(CHORD_Am);
+  delay(1.2);
   Serial.println("Releasing all...");
   for (int s = 1; s <= 6; s++) releaseString(s);
   delay(2000);
