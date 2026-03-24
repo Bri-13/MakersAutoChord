@@ -1,3 +1,4 @@
+
 // 6 MOTOR MECHANISM, ASSUMING START IS AT TOP ALWAYS(OTHERWISE NEED HOMING SWITCH)
 // MERCURY MOTOR SM-42BYG011-25 2-PHASE
 
@@ -130,10 +131,405 @@ void setup() {
 }
 // MAIN LOOP (TEST)
 void loop() {
-  # Beginning of Riptide
+  # Beginning of Riptide - Line 1
   Serial.println("Playing Am");
   playChord(CHORD_Am);
-  delay(1.2);
+  delay(1200);
   Serial.println("Releasing all...");
   for (int s = 1; s <= 6; s++) releaseString(s);
-  delay(2000);
+  Serial.println("Playing G");
+  playChord(CHORD_G);
+  delay(1200);
+  Serial.println("Releasing all...");
+  Serial.println("Playing C");
+  playChord(CHORD_C);
+  delay(2400);
+  Serial.println("Releasing all...");
+  for (int s = 1; s <= 6; s++) releaseString(s);
+
+  # Beginning of Riptide - Line 2
+  Serial.println("Playing Am");
+  playChord(CHORD_Am);
+  delay(1200);
+  Serial.println("Releasing all...");
+  for (int s = 1; s <= 6; s++) releaseString(s);
+  Serial.println("Playing G");
+  playChord(CHORD_G);
+  delay(1200);
+  Serial.println("Releasing all...");
+  Serial.println("Playing C");
+  playChord(CHORD_C);
+  delay(2400);
+  Serial.println("Releasing all...");
+  for (int s = 1; s <= 6; s++) releaseString(s);
+
+
+
+
+  # "I was scared of dentists and the dark"
+  Serial.println("Playing Am");
+  playChord(CHORD_Am);
+  delay(1200);
+  Serial.println("Releasing all...");
+  for (int s = 1; s <= 6; s++) releaseString(s);
+  Serial.println("Playing G");
+  playChord(CHORD_G);
+  delay(1200);
+  Serial.println("Releasing all...");
+  Serial.println("Playing C");
+  playChord(CHORD_C);
+  delay(2400);
+  Serial.println("Releasing all...");
+  for (int s = 1; s <= 6; s++) releaseString(s);
+
+
+
+  # "I was scared of pretty girls and starting conversations"
+  Serial.println("Playing Am");
+  playChord(CHORD_Am);
+  delay(1200);
+  Serial.println("Releasing all...");
+  for (int s = 1; s <= 6; s++) releaseString(s);
+  Serial.println("Playing G");
+  playChord(CHORD_G);
+  delay(1200);
+  Serial.println("Releasing all...");
+  Serial.println("Playing C");
+  playChord(CHORD_C);
+  delay(2400);
+  Serial.println("Releasing all...");
+  for (int s = 1; s <= 6; s++) releaseString(s);
+
+
+  # "Oh, all my friends are turning green"
+  Serial.println("Playing Am");
+  playChord(CHORD_Am);
+  delay(1200);
+  Serial.println("Releasing all...");
+  for (int s = 1; s <= 6; s++) releaseString(s);
+  Serial.println("Playing G");
+  playChord(CHORD_G);
+  delay(1200);
+  Serial.println("Releasing all...");
+  Serial.println("Playing C");
+  playChord(CHORD_C);
+  delay(2400);
+  Serial.println("Releasing all...");
+  for (int s = 1; s <= 6; s++) releaseString(s);
+
+
+  # "You're the magician's assistant in their dream"
+  Serial.println("Playing Am");
+  playChord(CHORD_Am);
+  delay(1200);
+  Serial.println("Releasing all...");
+  for (int s = 1; s <= 6; s++) releaseString(s);
+  Serial.println("Playing G");
+  playChord(CHORD_G);
+  delay(1200);
+  Serial.println("Releasing all...");
+  Serial.println("Playing C");
+  playChord(CHORD_C);
+  delay(2400);
+  Serial.println("Releasing all...");
+  for (int s = 1; s <= 6; s++) releaseString(s);
+
+
+
+  # "Ah oooh ooooh oooh"
+  Serial.println("Playing Am");
+  playChord(CHORD_Am);
+  delay(1200);
+  Serial.println("Releasing all...");
+  for (int s = 1; s <= 6; s++) releaseString(s);
+  Serial.println("Playing G");
+  playChord(CHORD_G);
+  delay(1200);
+  Serial.println("Releasing all...");
+  Serial.println("Playing C");
+  playChord(CHORD_C);
+  delay(2400);
+  Serial.println("Releasing all...");
+  for (int s = 1; s <= 6; s++) releaseString(s);
+
+
+  # Ah-ooh oooh, and they come unstuck
+  Serial.println("Playing Am");
+  playChord(CHORD_Am);
+  delay(1200);
+  Serial.println("Releasing all...");
+  for (int s = 1; s <= 6; s++) releaseString(s);
+  Serial.println("Playing G");
+  playChord(CHORD_G);
+  delay(1200);
+  Serial.println("Releasing all...");
+  Serial.println("Playing C");
+  playChord(CHORD_C);
+  delay(2400);
+  Serial.println("Releasing all...");
+  for (int s = 1; s <= 6; s++) releaseString(s);
+
+
+  # Lady, coming down to the riptide, taken away
+  Serial.println("Playing Am");
+  playChord(CHORD_Am);
+  delay(1200);
+  Serial.println("Releasing all...");
+  for (int s = 1; s <= 6; s++) releaseString(s);
+  Serial.println("Playing G");
+  playChord(CHORD_G);
+  delay(1200);
+  Serial.println("Releasing all...");
+  Serial.println("Playing C");
+  playChord(CHORD_C);
+  delay(2400);
+  Serial.println("Releasing all...");
+  for (int s = 1; s <= 6; s++) releaseString(s);
+
+  # To the dark side, I wanna be your left hand man
+  Serial.println("Playing Am");
+  playChord(CHORD_Am);
+  delay(1200);
+  Serial.println("Releasing all...");
+  for (int s = 1; s <= 6; s++) releaseString(s);
+  Serial.println("Playing G");
+  playChord(CHORD_G);
+  delay(1200);
+  Serial.println("Releasing all...");
+  Serial.println("Playing C");
+  playChord(CHORD_C);
+  delay(2400);
+  Serial.println("Releasing all...");
+  for (int s = 1; s <= 6; s++) releaseString(s);
+
+
+  # I love you when you're singing that song, and I got a lump
+  Serial.println("Playing Am");
+  playChord(CHORD_Am);
+  delay(1200);
+  Serial.println("Releasing all...");
+  for (int s = 1; s <= 6; s++) releaseString(s);
+  Serial.println("Playing G");
+  playChord(CHORD_G);
+  delay(1200);
+  Serial.println("Releasing all...");
+  Serial.println("Playing C");
+  playChord(CHORD_C);
+  delay(2400);
+  Serial.println("Releasing all...");
+  for (int s = 1; s <= 6; s++) releaseString(s);
+
+  # In my throat, cause you're gonna sing the words wrong
+  Serial.println("Playing Am");
+  playChord(CHORD_Am);
+  delay(1200);
+  Serial.println("Releasing all...");
+  for (int s = 1; s <= 6; s++) releaseString(s);
+  Serial.println("Playing G");
+  playChord(CHORD_G);
+  delay(1200);
+  Serial.println("Releasing all...");
+  Serial.println("Playing C");
+  playChord(CHORD_C);
+  delay(2400);
+  Serial.println("Releasing all...");
+  for (int s = 1; s <= 6; s++) releaseString(s);
+
+
+
+  # There's this movie that I think you'll like
+  Serial.println("Playing Am");
+  playChord(CHORD_Am);
+  delay(1200);
+  Serial.println("Releasing all...");
+  for (int s = 1; s <= 6; s++) releaseString(s);
+  Serial.println("Playing G");
+  playChord(CHORD_G);
+  delay(1200);
+  Serial.println("Releasing all...");
+  Serial.println("Playing C");
+  playChord(CHORD_C);
+  delay(2400);
+  Serial.println("Releasing all...");
+  for (int s = 1; s <= 6; s++) releaseString(s);
+
+
+
+  # This guy decides to quit his job and head to New York City
+  Serial.println("Playing Am");
+  playChord(CHORD_Am);
+  delay(1200);
+  Serial.println("Releasing all...");
+  for (int s = 1; s <= 6; s++) releaseString(s);
+  Serial.println("Playing G");
+  playChord(CHORD_G);
+  delay(1200);
+  Serial.println("Releasing all...");
+  Serial.println("Playing C");
+  playChord(CHORD_C);
+  delay(2400);
+  Serial.println("Releasing all...");
+  for (int s = 1; s <= 6; s++) releaseString(s);
+
+
+  # This cowboy's running from himself
+  Serial.println("Playing Am");
+  playChord(CHORD_Am);
+  delay(1200);
+  Serial.println("Releasing all...");
+  for (int s = 1; s <= 6; s++) releaseString(s);
+  Serial.println("Playing G");
+  playChord(CHORD_G);
+  delay(1200);
+  Serial.println("Releasing all...");
+  Serial.println("Playing C");
+  playChord(CHORD_C);
+  delay(2400);
+  Serial.println("Releasing all...");
+  for (int s = 1; s <= 6; s++) releaseString(s);
+
+
+  # And she's been living on the highest shelf
+  Serial.println("Playing Am");
+  playChord(CHORD_Am);
+  delay(1200);
+  Serial.println("Releasing all...");
+  for (int s = 1; s <= 6; s++) releaseString(s);
+  Serial.println("Playing G");
+  playChord(CHORD_G);
+  delay(1200);
+  Serial.println("Releasing all...");
+  Serial.println("Playing C");
+  playChord(CHORD_C);
+  delay(2400);
+  Serial.println("Releasing all...");
+  for (int s = 1; s <= 6; s++) releaseString(s);
+
+
+  # "Ah oooh ooooh oooh"
+  Serial.println("Playing Am");
+  playChord(CHORD_Am);
+  delay(1200);
+  Serial.println("Releasing all...");
+  for (int s = 1; s <= 6; s++) releaseString(s);
+  Serial.println("Playing G");
+  playChord(CHORD_G);
+  delay(1200);
+  Serial.println("Releasing all...");
+  Serial.println("Playing C");
+  playChord(CHORD_C);
+  delay(2400);
+  Serial.println("Releasing all...");
+  for (int s = 1; s <= 6; s++) releaseString(s);
+
+
+  # Ah-ooh oooh, and they come unstuck
+  Serial.println("Playing Am");
+  playChord(CHORD_Am);
+  delay(1200);
+  Serial.println("Releasing all...");
+  for (int s = 1; s <= 6; s++) releaseString(s);
+  Serial.println("Playing G");
+  playChord(CHORD_G);
+  delay(1200);
+  Serial.println("Releasing all...");
+  Serial.println("Playing C");
+  playChord(CHORD_C);
+  delay(2400);
+  Serial.println("Releasing all...");
+  for (int s = 1; s <= 6; s++) releaseString(s);
+
+
+  
+   # Lady, coming down to the riptide, taken away
+  Serial.println("Playing Am");
+  playChord(CHORD_Am);
+  delay(1200);
+  Serial.println("Releasing all...");
+  for (int s = 1; s <= 6; s++) releaseString(s);
+  Serial.println("Playing G");
+  playChord(CHORD_G);
+  delay(1200);
+  Serial.println("Releasing all...");
+  Serial.println("Playing C");
+  playChord(CHORD_C);
+  delay(2400);
+  Serial.println("Releasing all...");
+  for (int s = 1; s <= 6; s++) releaseString(s);
+
+
+  # To the dark side, I wanna be your left hand man
+  Serial.println("Playing Am");
+  playChord(CHORD_Am);
+  delay(1200);
+  Serial.println("Releasing all...");
+  for (int s = 1; s <= 6; s++) releaseString(s);
+  Serial.println("Playing G");
+  playChord(CHORD_G);
+  delay(1200);
+  Serial.println("Releasing all...");
+  Serial.println("Playing C");
+  playChord(CHORD_C);
+  delay(2400);
+  Serial.println("Releasing all...");
+  for (int s = 1; s <= 6; s++) releaseString(s);
+
+
+  # I love you when you're singing that song, and I got a lump
+  Serial.println("Playing Am");
+  playChord(CHORD_Am);
+  delay(1200);
+  Serial.println("Releasing all...");
+  for (int s = 1; s <= 6; s++) releaseString(s);
+  Serial.println("Playing G");
+  playChord(CHORD_G);
+  delay(1200);
+  Serial.println("Releasing all...");
+  Serial.println("Playing C");
+  playChord(CHORD_C);
+  delay(2400);
+  Serial.println("Releasing all...");
+  for (int s = 1; s <= 6; s++) releaseString(s);
+
+
+  # In my throat, cause you're gonna sing the words wrong
+  Serial.println("Playing Am");
+  playChord(CHORD_Am);
+  delay(1200);
+  Serial.println("Releasing all...");
+  for (int s = 1; s <= 6; s++) releaseString(s);
+  Serial.println("Playing G");
+  playChord(CHORD_G);
+  delay(1200);
+  Serial.println("Releasing all...");
+  Serial.println("Playing C");
+  playChord(CHORD_C);
+  delay(2400);
+  Serial.println("Releasing all...");
+  for (int s = 1; s <= 6; s++) releaseString(s);
+
+
+  ### FINALLY CHANGES A BIT FOR THE BRIDGE
+  # "I just wanna, I just wanna know"
+  Serial.println("Playing Am");
+  playChord(CHORD_Am);
+  delay(2400);
+  Serial.println("Releasing all...");
+  for (int s = 1; s <= 6; s++) releaseString(s);
+  Serial.println("Playing G");
+  playChord(CHORD_G);
+  delay(2400);
+  Serial.println("Releasing all...");
+  for (int s = 1; s <= 6; s++) releaseString(s);
+
+  # "If you're gonna, If you're gonna stay"
+  Serial.println("Playing C");
+  playChord(CHORD_C);
+  delay(2400);
+  Serial.println("Releasing all...");
+  for (int s = 1; s <= 6; s++) releaseString(s);
+  Serial.println("Playing Fmaj7");
+  playChord(CHORD_G);
+  delay(2400);
+  Serial.println("Releasing all...");
+  for (int s = 1; s <= 6; s++) releaseString(s);
