@@ -2,6 +2,16 @@
 #include <math.h>
 #include <string.h>
 
+// Song event must be defined before any functions that use it,
+// because Arduino auto-generates prototypes.
+struct SongEvent {
+  uint32_t atMs;
+  const char* lyric;
+  int* chord;
+  const char* chordName;
+  uint32_t holdMs;
+};
+
 // ============================================================
 // ESP32 + A4988 chord player for Wokwi
 // Uses working motor motion style from the chorus demo,
@@ -138,14 +148,6 @@ void printPositions() {
 }
 
 // ---------- SONG TIMING MAP ----------
-struct SongEvent {
-  uint32_t atMs;
-  const char* lyric;
-  int* chord;
-  const char* chordName;
-  uint32_t holdMs;
-};
-
 const int MAX_EVENTS = 256;
 SongEvent events[MAX_EVENTS];
 int eventCount = 0;
@@ -315,7 +317,7 @@ void singLine(const char* lyric, int chord[6], const char* chordName, int holdMs
   delay(holdMs);
 }
 
-void playEvent(const SongEvent& ev) {
+void playEvent(SongEvent ev) {
   Serial.println("--------------------------------");
   Serial.print("Lyric: ");
   Serial.println(ev.lyric);
