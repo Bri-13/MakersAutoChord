@@ -1,0 +1,372 @@
+#include <Arduino.h>
+#include <math.h>
+#include <string.h>
+
+// ============================================================
+// ESP32 + A4988 chord player for Wokwi
+// Uses working motor motion style from the chorus demo,
+// while keeping a preset timing map for the full song.
+//
+// String order: {E, A, D, G, B, e}
+// ============================================================
+
+// ---------- ESP32 PIN MAP ----------
+#define M1_STEP 18
+#define M1_DIR  19
+
+#define M2_STEP 25
+#define M2_DIR  26
+
+#define M3_STEP 27
+#define M3_DIR  14
+
+#define M4_STEP 12
+#define M4_DIR  13
+
+#define M5_STEP 32
+#define M5_DIR  33
+
+#define M6_STEP 23
+#define M6_DIR  22
+
+#define ENABLE_PIN 15   // A4988 enable is active LOW
+
+const int STEP_PINS[6] = {M1_STEP, M2_STEP, M3_STEP, M4_STEP, M5_STEP, M6_STEP};
+const int DIR_PINS[6]  = {M1_DIR,  M2_DIR,  M3_DIR,  M4_DIR,  M5_DIR,  M6_DIR};
+
+// ---------- CHORDS ----------
+// Order: {E, A, D, G, B, e}
+int CHORD_C[6]     = {0, 3, 2, 0, 1, 0};
+int CHORD_G[6]     = {3, 2, 0, 0, 0, 3};
+int CHORD_Am[6]    = {0, 0, 2, 2, 1, 0};
+int CHORD_Fmaj7[6] = {0, 0, 3, 2, 1, 0};
+
+// ---------- FAST WOKWI TEST POSITIONS ----------
+// Keep these small in simulation so the motion finishes quickly.
+float fret_mm_pos[8] = {
+  0.0,  // open
+  1.0,  // fret 1
+  2.0,  // fret 2
+  3.0,  // fret 3
+  4.0,  // fret 4
+  5.0,  // fret 5
+  6.0,  // fret 6
+  7.0   // fret 7
+};
+
+const float STEPS_PER_REV = 200.0;
+const float MICROSTEPPING = 16.0;
+const float LEAD_MM = 8.0;
+const float STEPS_PER_MM = (STEPS_PER_REV * MICROSTEPPING) / LEAD_MM; // 400
+
+const float MIN_MM = 0.0;
+const float MAX_MM = 7.0;
+const int STEP_PULSE_US = 400;
+
+float current_mm[6] = {0, 0, 0, 0, 0, 0};
+
+// ---------- LOW LEVEL ----------
+void pulseStepPin(int stepPin) {
+  digitalWrite(stepPin, HIGH);
+  delayMicroseconds(STEP_PULSE_US);
+  digitalWrite(stepPin, LOW);
+  delayMicroseconds(STEP_PULSE_US);
+}
+
+float clampMM(float value) {
+  if (value < MIN_MM) return MIN_MM;
+  if (value > MAX_MM) return MAX_MM;
+  return value;
+}
+
+void moveMotorRelativeMM(int stepPin, int dirPin, float deltaMM) {
+  long steps = lroundf(fabsf(deltaMM) * STEPS_PER_MM);
+  if (steps <= 0) return;
+
+  digitalWrite(dirPin, deltaMM >= 0 ? HIGH : LOW);
+
+  for (long i = 0; i < steps; i++) {
+    pulseStepPin(stepPin);
+  }
+}
+
+void moveStringToMM(int stringNum, float targetMM) {
+  if (stringNum < 1 || stringNum > 6) return;
+
+  int idx = stringNum - 1;
+  targetMM = clampMM(targetMM);
+
+  float deltaMM = targetMM - current_mm[idx];
+  moveMotorRelativeMM(STEP_PINS[idx], DIR_PINS[idx], deltaMM);
+  current_mm[idx] = targetMM;
+}
+
+void goToFret(int stringNum, int fretNum) {
+  if (stringNum < 1 || stringNum > 6) return;
+  if (fretNum < 0 || fretNum > 7) return;
+
+  moveStringToMM(stringNum, fret_mm_pos[fretNum]);
+}
+
+void releaseString(int stringNum) {
+  moveStringToMM(stringNum, 0.0);
+}
+
+void releaseAllStrings() {
+  for (int s = 1; s <= 6; s++) {
+    releaseString(s);
+  }
+}
+
+void playChord(int chord[6]) {
+  for (int i = 0; i < 6; i++) {
+    if (chord[i] == 0) {
+      releaseString(i + 1);
+    } else {
+      goToFret(i + 1, chord[i]);
+    }
+  }
+}
+
+void printPositions() {
+  Serial.print("Positions: ");
+  for (int i = 0; i < 6; i++) {
+    Serial.print(current_mm[i], 1);
+    if (i < 5) Serial.print(", ");
+  }
+  Serial.println();
+}
+
+// ---------- SONG TIMING MAP ----------
+struct SongEvent {
+  uint32_t atMs;
+  const char* lyric;
+  int* chord;
+  const char* chordName;
+  uint32_t holdMs;
+};
+
+const int MAX_EVENTS = 256;
+SongEvent events[MAX_EVENTS];
+int eventCount = 0;
+uint32_t songLengthMs = 0;
+
+void addEvent(const char* lyric, int* chord, const char* chordName, uint32_t holdMs) {
+  if (eventCount >= MAX_EVENTS) return;
+  events[eventCount++] = {songLengthMs, lyric, chord, chordName, holdMs};
+  songLengthMs += holdMs;
+}
+
+void addRest(uint32_t ms) {
+  songLengthMs += ms;
+}
+
+void buildSongMap() {
+  eventCount = 0;
+  songLengthMs = 0;
+
+  // Intro
+  addEvent("[Intro]", CHORD_Am, "Am", 1200);
+  addEvent("[Intro]", CHORD_G, "G", 1200);
+  addEvent("[Intro]", CHORD_C, "C", 2400);
+  addEvent("[Intro]", CHORD_Am, "Am", 1200);
+  addEvent("[Intro]", CHORD_G, "G", 1200);
+  addEvent("[Intro]", CHORD_C, "C", 2400);
+
+  // Verse 1
+  addEvent("I was scared of dentists and the dark", CHORD_Am, "Am", 1200);
+  addEvent("I was scared of dentists and the dark", CHORD_G, "G", 1200);
+  addEvent("I was scared of dentists and the dark", CHORD_C, "C", 2400);
+
+  addEvent("I was scared of pretty girls and starting conversations", CHORD_Am, "Am", 1200);
+  addEvent("I was scared of pretty girls and starting conversations", CHORD_G, "G", 1200);
+  addEvent("I was scared of pretty girls and starting conversations", CHORD_C, "C", 2400);
+
+  addEvent("Oh, all my friends are turning green", CHORD_Am, "Am", 1200);
+  addEvent("Oh, all my friends are turning green", CHORD_G, "G", 1200);
+  addEvent("Oh, all my friends are turning green", CHORD_C, "C", 2400);
+
+  addEvent("You're the magician's assistant in their dreams", CHORD_Am, "Am", 1200);
+  addEvent("You're the magician's assistant in their dreams", CHORD_G, "G", 1200);
+  addEvent("You're the magician's assistant in their dreams", CHORD_C, "C", 2400);
+
+  // Pre-chorus
+  addEvent("A-ooh, ooh, ooh", CHORD_Am, "Am", 1200);
+  addEvent("A-ooh, ooh, ooh", CHORD_G, "G", 1200);
+  addEvent("A-ooh, ooh, ooh", CHORD_C, "C", 2400);
+
+  addEvent("A-oh, ohoh, and they come unstuck", CHORD_Am, "Am", 1200);
+  addEvent("A-oh, ohoh, and they come unstuck", CHORD_G, "G", 1200);
+  addEvent("A-oh, ohoh, and they come unstuck", CHORD_C, "C", 2400);
+
+  // Chorus
+  addEvent("Lady, running down to the riptide, taken away", CHORD_Am, "Am", 1200);
+  addEvent("Lady, running down to the riptide, taken away", CHORD_G, "G", 1200);
+  addEvent("Lady, running down to the riptide, taken away", CHORD_C, "C", 2400);
+
+  addEvent("To the dark side, I wanna be your left hand man", CHORD_Am, "Am", 1200);
+  addEvent("To the dark side, I wanna be your left hand man", CHORD_G, "G", 1200);
+  addEvent("To the dark side, I wanna be your left hand man", CHORD_C, "C", 2400);
+
+  addEvent("I love you when you're singing that song, and I got a lump", CHORD_Am, "Am", 1200);
+  addEvent("I love you when you're singing that song, and I got a lump", CHORD_G, "G", 1200);
+  addEvent("I love you when you're singing that song, and I got a lump", CHORD_C, "C", 2400);
+
+  addEvent("In my throat, cause you're gonna sing the words wrong", CHORD_Am, "Am", 1200);
+  addEvent("In my throat, cause you're gonna sing the words wrong", CHORD_G, "G", 1200);
+  addEvent("In my throat, cause you're gonna sing the words wrong", CHORD_C, "C", 2400);
+
+  // Verse 2
+  addEvent("There's this movie that I think you'll like", CHORD_Am, "Am", 1200);
+  addEvent("There's this movie that I think you'll like", CHORD_G, "G", 1200);
+  addEvent("There's this movie that I think you'll like", CHORD_C, "C", 2400);
+
+  addEvent("This guy decides to quit his job and heads to New York City", CHORD_Am, "Am", 1200);
+  addEvent("This guy decides to quit his job and heads to New York City", CHORD_G, "G", 1200);
+  addEvent("This guy decides to quit his job and heads to New York City", CHORD_C, "C", 2400);
+
+  addEvent("This cowboy's running from himself", CHORD_Am, "Am", 1200);
+  addEvent("This cowboy's running from himself", CHORD_G, "G", 1200);
+  addEvent("This cowboy's running from himself", CHORD_C, "C", 2400);
+
+  addEvent("And she's been living on the highest shelf", CHORD_Am, "Am", 1200);
+  addEvent("And she's been living on the highest shelf", CHORD_G, "G", 1200);
+  addEvent("And she's been living on the highest shelf", CHORD_C, "C", 2400);
+
+  // Pre-chorus again
+  addEvent("A-ooh, ooh, ooh", CHORD_Am, "Am", 1200);
+  addEvent("A-ooh, ooh, ooh", CHORD_G, "G", 1200);
+  addEvent("A-ooh, ooh, ooh", CHORD_C, "C", 2400);
+
+  addEvent("A-oh, ohoh, and they come unstuck", CHORD_Am, "Am", 1200);
+  addEvent("A-oh, ohoh, and they come unstuck", CHORD_G, "G", 1200);
+  addEvent("A-oh, ohoh, and they come unstuck", CHORD_C, "C", 2400);
+
+  // Chorus repeat
+  addEvent("Lady, running down to the riptide, taken away", CHORD_Am, "Am", 1200);
+  addEvent("Lady, running down to the riptide, taken away", CHORD_G, "G", 1200);
+  addEvent("Lady, running down to the riptide, taken away", CHORD_C, "C", 2400);
+
+  addEvent("To the dark side, I wanna be your left hand man", CHORD_Am, "Am", 1200);
+  addEvent("To the dark side, I wanna be your left hand man", CHORD_G, "G", 1200);
+  addEvent("To the dark side, I wanna be your left hand man", CHORD_C, "C", 2400);
+
+  addEvent("I love you when you're singing that song, and I got a lump", CHORD_Am, "Am", 1200);
+  addEvent("I love you when you're singing that song, and I got a lump", CHORD_G, "G", 1200);
+  addEvent("I love you when you're singing that song, and I got a lump", CHORD_C, "C", 2400);
+
+  addEvent("In my throat, cause you're gonna sing the words wrong", CHORD_Am, "Am", 1200);
+  addEvent("In my throat, cause you're gonna sing the words wrong", CHORD_G, "G", 1200);
+  addEvent("In my throat, cause you're gonna sing the words wrong", CHORD_C, "C", 2400);
+
+  // Interlude / picking section - held as a pause here
+  addRest(2000);
+
+  // Bridge
+  addEvent("I just wanna, I just wanna know", CHORD_Am, "Am", 2400);
+  addEvent("I just wanna, I just wanna know", CHORD_G, "G", 2400);
+
+  addEvent("If you're gonna, if you're gonna stay", CHORD_C, "C", 2400);
+  addEvent("If you're gonna, if you're gonna stay", CHORD_Fmaj7, "Fmaj7", 2400);
+
+  addEvent("I just gotta, I just gotta know", CHORD_Am, "Am", 2400);
+  addEvent("I just gotta, I just gotta know", CHORD_G, "G", 2400);
+
+  addEvent("I can't have it, I can't have it any other way", CHORD_C, "C", 2400);
+  addEvent("I can't have it, I can't have it any other way", CHORD_Fmaj7, "Fmaj7", 2400);
+
+  // Pre-chorus (strum once and hold)
+  addEvent("I swear she's destined for the screen", CHORD_Am, "Am", 1200);
+  addEvent("I swear she's destined for the screen", CHORD_G, "G", 1200);
+  addEvent("I swear she's destined for the screen", CHORD_C, "C", 2400);
+
+  addEvent("Closest thing to Michelle Pfeiffer that you've ever seen, oh", CHORD_Am, "Am", 1200);
+  addEvent("Closest thing to Michelle Pfeiffer that you've ever seen, oh", CHORD_G, "G", 1200);
+  addEvent("Closest thing to Michelle Pfeiffer that you've ever seen, oh", CHORD_C, "C", 2400);
+
+  // Final chorus
+  addEvent("Lady, running down to the riptide, taken away", CHORD_Am, "Am", 1200);
+  addEvent("Lady, running down to the riptide, taken away", CHORD_G, "G", 1200);
+  addEvent("Lady, running down to the riptide, taken away", CHORD_C, "C", 2400);
+
+  addEvent("To the dark side, I wanna be your left hand man", CHORD_Am, "Am", 1200);
+  addEvent("To the dark side, I wanna be your left hand man", CHORD_G, "G", 1200);
+  addEvent("To the dark side, I wanna be your left hand man", CHORD_C, "C", 2400);
+
+  addEvent("I love you when you're singing that song, and I got a lump", CHORD_Am, "Am", 1200);
+  addEvent("I love you when you're singing that song, and I got a lump", CHORD_G, "G", 1200);
+  addEvent("I love you when you're singing that song, and I got a lump", CHORD_C, "C", 2400);
+
+  addEvent("In my throat, cause you're gonna sing the words wrong", CHORD_Am, "Am", 1200);
+  addEvent("In my throat, cause you're gonna sing the words wrong", CHORD_G, "G", 1200);
+  addEvent("In my throat, cause you're gonna sing the words wrong", CHORD_C, "C", 2400);
+}
+
+// ---------- PLAYBACK ----------
+void singLine(const char* lyric, int chord[6], const char* chordName, int holdMs) {
+  Serial.println("--------------------------------");
+  Serial.print("Lyric: ");
+  Serial.println(lyric);
+  Serial.print("Chord: ");
+  Serial.println(chordName);
+
+  playChord(chord);
+  printPositions();
+  delay(holdMs);
+}
+
+void playEvent(const SongEvent& ev) {
+  Serial.println("--------------------------------");
+  Serial.print("Lyric: ");
+  Serial.println(ev.lyric);
+  Serial.print("Chord: ");
+  Serial.println(ev.chordName);
+
+  playChord(ev.chord);
+  printPositions();
+}
+
+void playSongOnce() {
+  uint32_t songStart = millis();
+
+  for (int i = 0; i < eventCount; i++) {
+    while ((millis() - songStart) < events[i].atMs) {
+      delay(1);
+    }
+    playEvent(events[i]);
+  }
+}
+
+// ---------- SETUP ----------
+void setup() {
+  Serial.begin(115200);
+
+  pinMode(ENABLE_PIN, OUTPUT);
+  digitalWrite(ENABLE_PIN, LOW); // enable A4988 drivers
+
+  for (int i = 0; i < 6; i++) {
+    pinMode(STEP_PINS[i], OUTPUT);
+    pinMode(DIR_PINS[i], OUTPUT);
+    digitalWrite(STEP_PINS[i], LOW);
+    digitalWrite(DIR_PINS[i], LOW);
+    current_mm[i] = 0.0;
+  }
+
+  buildSongMap();
+
+  Serial.println("Riptide timing-map demo ready.");
+  Serial.println("Homing strings to top hard stop...");
+  releaseAllStrings();
+  delay(1000);
+  Serial.println("Open the Serial Monitor to see lyrics + chords.");
+  Serial.println();
+}
+
+// ---------- LOOP ----------
+void loop() {
+  playSongOnce();
+
+  Serial.println("=== Song complete ===");
+  releaseAllStrings();
+  delay(2000);
+}
