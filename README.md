@@ -1,50 +1,119 @@
-# Welcome to your Expo app 👋
+# AutoChord 🚀
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+AutoChord is a mobile application built with **React Native using Expo** that helps users learn chord progressions and existing songs. The app is designed to make learning guitar easier by providing quick access to chords, progressions, and songs in an interactive interface.
 
-## Get started
+---
 
-1. Install dependencies
+## Features
 
-   ```bash
-   npm install
-   ```
+- Generate chord progressions automatically  
+- Explore different songs  
+- UI built with React Native (Expo)  
+- Fast and responsive interface  
+- Useful for musicians and beginners  
 
-2. Start the app
+---
 
-   ```bash
-   npx expo start
-   ```
+## Tech Stack
 
-In the output, you'll find options to open the app in a
+- React Native
+- JavaScript / TypeScript
+- Expo APIs
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+---
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+## Installation 📦
 
-## Get a fresh project
-
-When you're ready, run:
+### 1. Clone the repository
 
 ```bash
-npm run reset-project
+git clone https://github.com/Bri-13/MakersAutoChord.git
+cd MakersAutoChord
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+### 2. Install dependencies
 
-## Learn more
+Using npm:
 
-To learn more about developing your project with Expo, look at the following resources:
+```bash
+npm install
+```
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+Or using yarn:
 
-## Join the community
+```bash
+yarn install
+```
 
-Join our community of developers creating universal apps.
+---
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+## Running the App
+
+Start the Expo development server:
+
+```bash
+npx expo start
+```
+
+Then:
+
+- Press **i** → open iOS simulator (Mac only)  
+- Press **a** → open Android emulator  
+- Or scan the QR code using the **Expo Go app**
+
+---
+
+## Requirements
+
+Make sure you have:
+
+- Node.js (v16+ recommended)
+- npm or yarn
+- Expo CLI (optional):
+
+```bash
+npm install -g expo-cli
+```
+
+- Expo Go app (iOS/Android)
+
+---
+
+## Project Structure 📁
+
+```
+MakersAutoChord/
+├── assets/          
+├── components/      
+├── screens/         
+├── App.js           
+├── package.json     
+└── ...
+```
+
+---
+
+## Dependencies
+
+Main dependencies (installed via `package.json`):
+
+- react
+- react-native
+- expo
+
+Other possible dependencies:
+
+- expo-status-bar  
+- expo-constants  
+- react-navigation  
+
+Run `npm install` to install all dependencies.
+
+---
+
+## How It Works
+
+The app includes major and minor scales as well as existing songs.
+This allows users to quickly create musical ideas and experiment with different sounds.
+It can be paired with the automated fret board so that users can first learn how to strum
+in rhythm before learning the fingering for chords.
