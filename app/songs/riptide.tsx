@@ -1,4 +1,3 @@
-import { useRouter } from "expo-router";
 import React, { useRef, useState } from "react";
 import {
   Animated,
@@ -26,7 +25,6 @@ const SINGLE_CHORD_REGEX =
   /^[A-G](?:#|b)?(?:m|maj7|maj|min|dim|aug|sus\d*)?(?:\/[A-G](?:#|b)?)?$/;
 
 export default function RiptideScreen() {
-  const router = useRouter();
 
   const [bpm, setBpm] = useState("110");
   const [isPlaying, setIsPlaying] = useState(false);
@@ -36,8 +34,8 @@ export default function RiptideScreen() {
   const swing = useRef(new Animated.Value(0)).current;
 
   const scrollRef = useRef<ScrollView>(null);
-  const autoScrollInterval = useRef<NodeJS.Timeout | null>(null);
-  const chordTimer = useRef<NodeJS.Timeout | null>(null);
+  const autoScrollInterval = useRef<ReturnType<typeof setInterval> | null>(null);
+  const chordTimer = useRef<ReturnType<typeof setInterval> | null>(null);
   const [scrollOffset, setScrollOffset] = useState(0);
 
   const screenWidth = Dimensions.get("window").width;
@@ -275,15 +273,11 @@ In my throat, 'cause you're gonna sing the words wrong`;
 
   return (
     <KeyboardAvoidingView
-      style={{ flex: 1 }}
+      style={{ flex: 1, backgroundColor: "#0d0d0d" }}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
-      <View style={{ flex: 1 }}>
+      <View style={{ flex: 1, backgroundColor: "#0d0d0d" }}>
         <ScrollView ref={scrollRef} contentContainerStyle={{ paddingBottom: 180 }}>
-          <TouchableOpacity onPress={() => router.back()} style={{ marginTop: 20, marginLeft: 15 }}>
-            <Text style={{ fontSize: 18 }}>←</Text>
-          </TouchableOpacity>
-
           <Text style={styles.title}>Riptide</Text>
           <Text style={styles.subtitle}>Vance Joy</Text>
 
@@ -381,26 +375,36 @@ In my throat, 'cause you're gonna sing the words wrong`;
   );
 }
 
+const ACCENT = "#c0392b";
+const BG = "#0d0d0d";
+const CARD_BG = "#1a1a1a";
+const SURFACE = "#1e1e1e";
+const TEXT_PRIMARY = "#f0f0f0";
+const TEXT_SECONDARY = "#888";
+const BORDER = "#2a2a2a";
+
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "#F2F2F2",
+    backgroundColor: CARD_BG,
     borderRadius: 12,
     marginBottom: 20,
   },
-  title: { fontSize: 28, fontWeight: "700", textAlign: "center", marginTop: 10 },
-  subtitle: { fontSize: 16, textAlign: "center", color: "#777", marginBottom: 20 },
+  title: { fontSize: 28, fontWeight: "700", textAlign: "center", marginTop: 10, color: TEXT_PRIMARY },
+  subtitle: { fontSize: 16, textAlign: "center", color: TEXT_SECONDARY, marginBottom: 20 },
   metroBox: {
     marginHorizontal: 20,
     padding: 20,
     borderRadius: 16,
-    backgroundColor: "#F2F2F2",
+    backgroundColor: CARD_BG,
     alignItems: "center",
     marginBottom: 20,
+    borderWidth: 1,
+    borderColor: BORDER,
   },
-  metroLabel: { fontSize: 20, fontWeight: "600", marginBottom: 20 },
+  metroLabel: { fontSize: 20, fontWeight: "600", marginBottom: 20, color: TEXT_PRIMARY },
   barContainer: {
     height: 20,
-    backgroundColor: "#ddd",
+    backgroundColor: SURFACE,
     borderRadius: 10,
     justifyContent: "center",
     overflow: "hidden",
@@ -409,17 +413,20 @@ const styles = StyleSheet.create({
   bar: {
     width: 60,
     height: 20,
-    backgroundColor: "#000",
+    backgroundColor: ACCENT,
     borderRadius: 10,
   },
   bpmInput: {
-    backgroundColor: "#fff",
+    backgroundColor: SURFACE,
     borderRadius: 10,
     paddingVertical: 12,
     paddingHorizontal: 10,
     width: "40%",
     textAlign: "center",
     fontSize: 18,
+    color: TEXT_PRIMARY,
+    borderWidth: 1,
+    borderColor: BORDER,
   },
   sectionTitle: {
     fontSize: 22,
@@ -427,17 +434,20 @@ const styles = StyleSheet.create({
     marginTop: 25,
     marginLeft: 20,
     marginBottom: 5,
+    color: TEXT_PRIMARY,
   },
   lyricsBlock: {
     fontFamily: Platform.OS === "ios" ? "Courier" : "monospace",
     fontSize: 10,
     lineHeight: 18,
+    color: TEXT_PRIMARY,
   },
-  chord: { fontWeight: "700" },
+  chord: { fontWeight: "700", color: TEXT_PRIMARY },
   activeChord: {
-    backgroundColor: "#FF9800",
+    backgroundColor: ACCENT,
     paddingHorizontal: 2,
     borderRadius: 4,
+    color: "#fff",
   },
   startButton: {
     position: "absolute",
@@ -445,12 +455,12 @@ const styles = StyleSheet.create({
     left: 20,
     right: 20,
     padding: 16,
-    backgroundColor: "black",
+    backgroundColor: ACCENT,
     borderRadius: 10,
   },
   startText: {
     textAlign: "center",
-    color: "white",
+    color: "#fff",
     fontSize: 20,
     fontWeight: "600",
   },
@@ -462,11 +472,11 @@ const styles = StyleSheet.create({
     bottom: 0,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgba(255,255,255,0.6)",
+    backgroundColor: "rgba(0,0,0,0.7)",
   },
   countdownText: {
     fontSize: 120,
     fontWeight: "900",
-    color: "#000",
+    color: TEXT_PRIMARY,
   },
 });

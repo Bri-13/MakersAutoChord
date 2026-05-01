@@ -4,9 +4,13 @@ export default function RootLayout() {
   return (
     <Stack
       screenOptions={{
-        headerTitle: "",               // remove text
-        headerBackTitleVisible: false, // hide back button label (iOS)
+        headerTitle: "",
+        headerStyle: { backgroundColor: "#0d0d0d" },
+        headerShadowVisible: false,
+        headerTintColor: "#f0f0f0"
       }}
-    />
+    >
+      <Stack.Screen name="index" options={{ headerShown: false }} />
+    </Stack>
   );
 }

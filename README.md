@@ -52,7 +52,7 @@ yarn install
 Start the Expo development server:
 
 ```bash
-npx expo start
+npx expo start --tunnel
 ```
 
 Then:

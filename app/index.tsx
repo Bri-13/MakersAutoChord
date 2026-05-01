@@ -1,5 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import { StatusBar } from "expo-status-bar";
 import {
   Image,
   ScrollView,
@@ -9,6 +10,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Home() {
   const router = useRouter();
@@ -26,14 +28,16 @@ export default function Home() {
   ];
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.safeArea}>
+      <StatusBar style="light" backgroundColor="#0d0d0d" />
+      <View style={styles.container}>
       <ScrollView
         contentContainerStyle={{ paddingBottom: 120 }}
         showsVerticalScrollIndicator={false}
       >
         {/* Search */}
         <View style={styles.searchContainer}>
-          <Ionicons name="search" size={20} color="#777" />
+          <Ionicons name="search" size={20} color="#888" />
           <TextInput placeholder="Search" style={styles.searchInput} />
         </View>
 
@@ -65,7 +69,7 @@ export default function Home() {
         {/* Songs Section */}
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>Songs</Text>
-          <Ionicons name="chevron-forward" size={20} />
+          <Ionicons name="chevron-forward" size={20} color="#c0392b" />
         </View>
 
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
@@ -77,7 +81,7 @@ export default function Home() {
         {/* Scales Section */}
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>Scales</Text>
-          <Ionicons name="chevron-forward" size={20} />
+          <Ionicons name="chevron-forward" size={20} color="#c0392b" />
         </View>
 
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
@@ -102,25 +106,28 @@ export default function Home() {
 
       {/* Bottom Nav */}
       <View style={styles.bottomNav}>
-        <NavIcon icon="home" />
+        <NavIcon icon="home" active={true} />
         <NavIcon icon="compass" />
         <NavIcon icon="musical-notes" onPress={() => router.push("/songs")} />
         <NavIcon icon="person" />
       </View>
     </View>
+    </SafeAreaView>
   );
 }
 
 /* ---------- Components ---------- */
 
-const FeatureButton = ({ icon, label, onPress }) => (
+type FeatureButtonProps = { icon: string; label: string; onPress?: () => void };
+const FeatureButton = ({ icon, label, onPress }: FeatureButtonProps) => (
   <TouchableOpacity style={styles.featureButton} onPress={onPress}>
-    <Ionicons name={icon} size={18} />
-    <Text>{label}</Text>
+    <Ionicons name={icon as any} size={18} color="#fff" />
+    <Text style={styles.featureButtonText}>{label}</Text>
   </TouchableOpacity>
 );
 
-const SongCard = ({ song }) => (
+type SongData = { title: string; artist: string; cover: any; bpm: number };
+const SongCard = ({ song }: { song: SongData }) => (
   <View style={styles.songCard}>
     <Image source={song.cover} style={styles.cover} />
     <Text style={styles.bpm}>BPM: {song.bpm}</Text>
@@ -129,9 +136,10 @@ const SongCard = ({ song }) => (
   </View>
 );
 
-const NavIcon = ({ icon, onPress }) => (
+type NavIconProps = { icon: string; onPress?: () => void; active?: boolean };
+const NavIcon = ({ icon, onPress, active = false }: NavIconProps) => (
   <TouchableOpacity onPress={onPress}>
-    <Ionicons name={icon} size={28} />
+    <Ionicons name={icon as any} size={28} color={active ? "#c0392b" : "#888"} />
   </TouchableOpacity>
 );
 
@@ -160,19 +168,30 @@ const songData = [
 
 /* ---------- Styles ---------- */
 
+const ACCENT = "#c0392b";
+const BG = "#0d0d0d";
+const CARD_BG = "#1a1a1a";
+const SURFACE = "#1e1e1e";
+const TEXT_PRIMARY = "#f0f0f0";
+const TEXT_SECONDARY = "#888";
+const BORDER = "#2a2a2a";
+
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fff" },
+  container: { flex: 1, backgroundColor: BG },
+  safeArea: { flex: 1, backgroundColor: BG },
 
   searchContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#F2F2F2",
+    backgroundColor: SURFACE,
     marginHorizontal: 20,
     padding: 12,
     borderRadius: 12,
     marginTop: 15,
+    borderWidth: 1,
+    borderColor: BORDER,
   },
-  searchInput: { marginLeft: 10, fontSize: 16 },
+  searchInput: { marginLeft: 10, fontSize: 16, color: TEXT_PRIMARY, flex: 1 },
 
   buttonRow: {
     flexDirection: "row",
@@ -185,11 +204,16 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     gap: 6,
     alignItems: "center",
-    borderWidth: 1,
-    borderColor: "#ddd",
+    borderWidth: 1.5,
+    borderColor: ACCENT,
     paddingVertical: 10,
     paddingHorizontal: 14,
-    borderRadius: 10,
+    borderRadius: 20,
+  },
+  featureButtonText: {
+    color: TEXT_PRIMARY,
+    fontSize: 14,
+    fontWeight: "500",
   },
 
   featuredCard: {
@@ -213,43 +237,48 @@ const styles = StyleSheet.create({
     fontWeight: "700",
   },
   featuredArtist: {
-    color: "#fff",
+    color: "#ddd",
     fontSize: 14,
     marginTop: 4,
   },
 
   sectionHeader: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    alignItems: "center",
+    gap: 8,
     marginTop: 30,
     marginHorizontal: 20,
   },
-  sectionTitle: { fontSize: 20, fontWeight: "600" },
+  sectionTitle: { fontSize: 20, fontWeight: "600", color: TEXT_PRIMARY },
 
   songCard: {
     width: 170,
     marginLeft: 20,
     marginTop: 10,
+    backgroundColor: CARD_BG,
+    borderRadius: 12,
+    overflow: "hidden",
   },
   cover: {
     width: "100%",
     height: 170,
-    borderRadius: 12,
   },
-  bpm: { marginTop: 8, color: "#777", fontSize: 12 },
-  artist: { marginTop: 4, fontWeight: "500" },
-  songTitle: { fontSize: 15, fontWeight: "600" },
+  bpm: { marginTop: 8, marginHorizontal: 10, color: TEXT_SECONDARY, fontSize: 12 },
+  artist: { marginTop: 4, marginHorizontal: 10, fontWeight: "500", color: "#aaa" },
+  songTitle: { fontSize: 15, fontWeight: "600", color: TEXT_PRIMARY, marginHorizontal: 10, marginBottom: 10 },
 
   scaleBox: {
     width: 150,
     height: 120,
-    backgroundColor: "#F3F3F3",
+    backgroundColor: CARD_BG,
     borderRadius: 12,
     marginLeft: 20,
     justifyContent: "center",
     alignItems: "center",
+    borderWidth: 1,
+    borderColor: BORDER,
   },
-  scaleText: { fontSize: 16, fontWeight: "600" },
+  scaleText: { fontSize: 16, fontWeight: "600", color: TEXT_PRIMARY },
 
   bottomNav: {
     position: "absolute",
@@ -260,8 +289,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-around",
     alignItems: "center",
-    backgroundColor: "#fff",
+    backgroundColor: "#111",
     borderTopWidth: 1,
-    borderColor: "#eee",
+    borderColor: "#222",
   },
 });
