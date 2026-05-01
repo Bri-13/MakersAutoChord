@@ -43,13 +43,13 @@ float STEPS_PER_MM = (STEPS_PER_REV * MICROSTEPPING) / LEAD_MM;
 // on edge w enough room for piston, in cm
 float fret_mm_pos[8] = {
   0,        // open string no press
-  17,     // fret 1
-  52,    // fret 2
-  85,    // fret 3
-  118,    // fret 4
-  146,   // fret 5
-  175,    // fret 6
-  200    // fret 7
+  60,     // fret 1
+  90,    // fret 2
+  130,    // fret 3
+  160,    // fret 4
+  190,   // fret 5
+  215,    // fret 6
+  240    // fret 7
 };
 // MOTOR MOVE FUNCTION
 // motor function to move stepper
